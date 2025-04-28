@@ -5,6 +5,8 @@
 
 namespace SplashLab\CorsRequests\Model;
 
+use Magento\Framework\Webapi\Rest\Request;
+use Magento\Framework\Webapi\Rest\Response;
 use SplashLab\CorsRequests\Api\CorsCheckInterface;
 
 /**
@@ -13,16 +15,16 @@ use SplashLab\CorsRequests\Api\CorsCheckInterface;
  */
 class CorsCheck implements CorsCheckInterface
 {
+    protected Response $response;
+    protected Request $request;
 
     /**
-     * Initialize dependencies.
-     *
-     * @param \Magento\Framework\Webapi\Rest\Response $response
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface scopeConfig
+     * @param Response $response
+     * @param Request $request
      */
     public function __construct(
-        \Magento\Framework\Webapi\Rest\Response $response,
-        \Magento\Framework\Webapi\Rest\Request $request
+        Response $response,
+        Request $request
     ) {
         $this->response = $response;
         $this->request = $request;

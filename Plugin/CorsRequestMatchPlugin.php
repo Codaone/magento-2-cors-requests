@@ -6,8 +6,12 @@
 
 namespace SplashLab\CorsRequests\Plugin;
 
+use Magento\Framework\Controller\Router\Route\Factory;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Webapi\Exception;
 use Magento\Framework\Webapi\Rest\Request;
 use Magento\Webapi\Controller\Rest\Router;
+use Magento\Webapi\Controller\Rest\Router\Route;
 
 /**
  * Class CorsRequestMatchPlugin
@@ -16,26 +20,18 @@ use Magento\Webapi\Controller\Rest\Router;
  */
 class CorsRequestMatchPlugin
 {
-
-    /**
-     * @var \Magento\Framework\Webapi\Rest\Request
-     */
-    private $request;
-
-    /**
-     * @var \Magento\Framework\Controller\Router\Route\Factory
-     */
-    protected $routeFactory;
+    private Request $request;
+    protected Factory $routeFactory;
 
     /**
      * Initialize dependencies.
      *
-     * @param \Magento\Framework\Webapi\Rest\Request $request
-     * @param \Magento\Framework\Controller\Router\Route\Factory $routeFactory
+     * @param Request $request
+     * @param Factory $routeFactory
      */
     public function __construct(
-        \Magento\Framework\Webapi\Rest\Request $request,
-        \Magento\Framework\Controller\Router\Route\Factory $routeFactory
+        Request $request,
+        Factory $routeFactory
     ) {
         $this->request = $request;
         $this->routeFactory = $routeFactory;
@@ -44,21 +40,21 @@ class CorsRequestMatchPlugin
     /**
      * Generate the list of available REST routes. Current HTTP method is taken into account.
      *
-     * @param \Magento\Webapi\Model\Rest\Config $subject
-     * @param $proceed
+     * @param Router $subject
+     * @param callable $proceed
      * @param Request $request
-     * @return \Magento\Webapi\Controller\Rest\Router\Route
-     * @throws \Magento\Framework\Webapi\Exception
+     * @return Route
+     * @throws Exception
+     * @throws InputException
      */
     public function aroundMatch(
         Router $subject,
         callable $proceed,
         Request $request
-    )
-    {
+    ) {
         try {
             $returnValue = $proceed($request);
-        } catch (\Magento\Framework\Webapi\Exception $e) {
+        } catch (Exception $e) {
             $requestHttpMethod = $this->request->getHttpMethod();
             if ($requestHttpMethod == 'OPTIONS') {
                 return $this->createRoute();
@@ -72,11 +68,11 @@ class CorsRequestMatchPlugin
     /**
      * Create route object to the placeholder CORS route.
      *
-     * @return \Magento\Webapi\Controller\Rest\Router\Route
+     * @return Route
      */
     protected function createRoute()
     {
-        /** @var $route \Magento\Webapi\Controller\Rest\Router\Route */
+        /** @var $route Route */
         $route = $this->routeFactory->createRoute(
             'Magento\Webapi\Controller\Rest\Router\Route',
             '/V1/cors/check'

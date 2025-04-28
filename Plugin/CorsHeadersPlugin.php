@@ -6,8 +6,11 @@
 
 namespace SplashLab\CorsRequests\Plugin;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\FrontControllerInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Webapi\Rest\Response;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Class CorsHeadersPlugin
@@ -16,26 +19,18 @@ use Magento\Framework\App\RequestInterface;
  */
 class CorsHeadersPlugin
 {
-
-    /**
-     * @var \Magento\Framework\Webapi\Rest\Response
-     */
-    private $response;
-
-    /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    private $scopeConfig;
+    private Response $response;
+    private ScopeConfigInterface $scopeConfig;
 
     /**
      * Initialize dependencies.
      *
-     * @param \Magento\Framework\Webapi\Rest\Response $response
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface scopeConfig
+     * @param Response $response
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        \Magento\Framework\Webapi\Rest\Response $response,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        Response $response,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->response = $response;
         $this->scopeConfig = $scopeConfig;
@@ -48,37 +43,43 @@ class CorsHeadersPlugin
     protected function getOriginUrl()
     {
         return $this->scopeConfig->getValue('web/corsRequests/origin_url',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+            ScopeInterface::SCOPE_STORE);
     }
 
     /**
      * Get the origin domain the requests are going to come from
-     * @return string
+     * @return bool
      */
     protected function getAllowCredentials()
     {
-        return (bool) $this->scopeConfig->getValue('web/corsRequests/allow_credentials',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return (bool) $this->scopeConfig->getValue(
+            'web/corsRequests/allow_credentials',
+            ScopeInterface::SCOPE_STORE
+        );
     }
 
     /**
      * Get the origin domain the requests are going to come from
-     * @return string
+     * @return bool
      */
     protected function getEnableAmp()
     {
-        return (bool) $this->scopeConfig->getValue('web/corsRequests/enable_amp',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return (bool) $this->scopeConfig->getValue(
+            'web/corsRequests/enable_amp',
+            ScopeInterface::SCOPE_STORE
+        );
     }
 
     /**
      * Get the Access-Control-Max-Age
-     * @return string
+     * @return int
      */
     protected function getMaxAge()
     {
-        return (int) $this->scopeConfig->getValue('web/corsRequests/max_age',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return (int) $this->scopeConfig->getValue(
+            'web/corsRequests/max_age',
+            ScopeInterface::SCOPE_STORE
+        );
     }
 
     /**
